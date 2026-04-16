@@ -6,11 +6,11 @@
 
 resource "aws_security_group" "lab" {
   name        = "lab-sg"
-  description = "Lab instance — SSH/Grafana/WebUI inbound from your IP only"
+  description = "Lab instance - SSH/Grafana/WebUI inbound from your IP only"
   vpc_id      = aws_vpc.lab.id
 
   ingress {
-    description = "SSH — FedRAMP AC-17"
+    description = "SSH (FedRAMP AC-17)"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
