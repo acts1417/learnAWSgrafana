@@ -7,7 +7,7 @@
 # you're ready to go through a formal assessment.
 
 resource "aws_kms_key" "ebs" {
-  description             = "CMK for EBS volume encryption — lab-boinc-grafana"
+  description             = "CMK for EBS volume encryption - lab-boinc-grafana"
   enable_key_rotation     = true # NIST SP 800-57 annual rotation
   deletion_window_in_days = 7
 

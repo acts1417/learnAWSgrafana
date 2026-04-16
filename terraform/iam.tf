@@ -5,7 +5,7 @@
 
 resource "aws_iam_role" "lab_ec2" {
   name        = "lab-ec2-role"
-  description = "EC2 role for lab-boinc-grafana — least privilege (FedRAMP AC-6)"
+  description = "EC2 role for lab-boinc-grafana - least privilege (FedRAMP AC-6)"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -81,7 +81,7 @@ resource "aws_iam_instance_profile" "lab" {
 
 resource "aws_iam_role" "flow_logs" {
   name        = "lab-vpc-flow-logs-role"
-  description = "Allows VPC Flow Logs to write to CloudWatch — least privilege"
+  description = "Allows VPC Flow Logs to write to CloudWatch - least privilege"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
