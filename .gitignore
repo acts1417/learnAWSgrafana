@@ -1,0 +1,14 @@
+# Terraform state and secrets — never commit these
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+terraform/*.tfplan
+
+# Docker secrets
+docker/.env
+
+# OS
+.DS_Store
+Thumbs.db

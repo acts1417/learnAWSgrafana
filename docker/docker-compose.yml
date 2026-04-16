@@ -1,0 +1,153 @@
+services:
+
+  # ── BOINC client ────────────────────────────────────────────────────────────
+  # Runs science workloads 24/7, sharing the GPU with Ollama.
+  # BOINC detects other CUDA processes and backs off when GPU is busy.
+  # GPU tag: amd64-nvidia enables CUDA crunching (CPU-only tag = "latest")
+  boinc:
+    image: boinc/client:amd64-nvidia
+    container_name: boinc
+    restart: unless-stopped
+    environment:
+      - BOINC_GUI_RPC_PASSWORD=${BOINC_RPC_PASSWORD:-changeme}
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+    volumes:
+      - boinc_data:/var/lib/boinc
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:31416:31416" # BOINC GUI RPC — localhost only, SSH-tunnel to manage
+
+  # ── Ollama ──────────────────────────────────────────────────────────────────
+  # LLM inference server. Start/stop on demand to reclaim GPU for BOINC.
+  # Pull a model: docker exec ollama ollama pull llama3.2
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:11434:11434" # Ollama API — localhost only
+
+  # ── Open WebUI ───────────────────────────────────────────────────────────────
+  # Browser-based chat frontend for Ollama.
+  # Access: http://<public-ip>:8080
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=changeme-use-a-random-string
+    volumes:
+      - open_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    networks:
+      - lab
+    ports:
+      - "0.0.0.0:8080:8080"
+
+  # ── Node Exporter ────────────────────────────────────────────────────────────
+  # System metrics: CPU, memory, disk, network.
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    networks:
+      - lab
+
+  # ── NVIDIA GPU Exporter ───────────────────────────────────────────────────────
+  # Exposes nvidia-smi metrics (utilization, memory, temperature, power) to Prometheus.
+  nvidia-gpu-exporter:
+    image: utkuozdemir/nvidia_gpu_exporter:1.2.0
+    container_name: nvidia-gpu-exporter
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+
+  # ── Prometheus ───────────────────────────────────────────────────────────────
+  # Scrapes metrics from node-exporter, nvidia-gpu-exporter (and boinc_exporter later).
+  # UI: http://localhost:9090 (SSH tunnel required)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:9090:9090" # localhost only
+
+  # ── Grafana ──────────────────────────────────────────────────────────────────
+  # Dashboards for GPU, system, and BOINC metrics.
+  # Access: http://<public-ip>:3000  (admin / <GRAFANA_ADMIN_PASSWORD>)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - lab
+    ports:
+      - "0.0.0.0:3000:3000"
+
+volumes:
+  boinc_data:
+  ollama_data:
+  open_webui_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  lab:
+    driver: bridge

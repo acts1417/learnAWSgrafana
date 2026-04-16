@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: Lab Dashboards
+    folder: Lab
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
