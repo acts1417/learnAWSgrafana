@@ -1,0 +1,29 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is git-ignored — secrets stay off GitHub.
+#
+# Step-by-step before running terraform apply:
+#
+# 1. AWS credentials in your shell:
+#      export AWS_ACCESS_KEY_ID="AKIAxxxxxxxxxxxxxxxxx"
+#      export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#    Or use: aws configure  (creates ~/.aws/credentials)
+#
+# 2. Create an EC2 key pair (one-time):
+#    AWS Console → EC2 → Key Pairs → Create key pair
+#    Choose ED25519, .pem format.  Download it, then:
+#      mv ~/Downloads/mykey.pem ~/.ssh/
+#      chmod 400 ~/.ssh/mykey.pem
+#
+# 3. Find your IP:
+#    curl https://checkip.amazonaws.com   →  e.g. 203.0.113.5
+#    Then append /32 below.
+
+aws_region     = "us-east-1"
+key_pair_name  = "mykey"                   # just the name, not the filename
+your_ip_cidr   = "203.0.113.5/32"          # replace with YOUR IP + /32
+
+boinc_rpc_password     = "change-me-to-something-strong"
+grafana_admin_password = "change-me-to-something-strong"
+
+# spot_max_price = "0.35"    # optional — default is fine for us-east-1
+# repo_url = "https://github.com/acts1417/learnawsgrafana.git"  # default
