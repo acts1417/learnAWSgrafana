@@ -75,7 +75,7 @@ resource "aws_instance" "lab" {
   }
 
   root_block_device {
-    volume_size           = 50
+    volume_size           = 80
     volume_type           = "gp3"
     encrypted             = true
     kms_key_id            = aws_kms_key.ebs.arn # CMK — FedRAMP SC-28
