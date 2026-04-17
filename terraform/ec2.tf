@@ -55,14 +55,17 @@ resource "aws_instance" "lab" {
   iam_instance_profile   = aws_iam_instance_profile.lab.name
 
   # Spot: ~60-70% cheaper than on-demand.
-  # persistent + stop = instance stops (not terminates) on reclaim; EBS survives;
-  # spot request stays open so the instance restarts when capacity returns.
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price                      = var.spot_max_price
-      spot_instance_type             = "persistent"
-      instance_interruption_behavior = "stop"
+  # Set use_spot = false in terraform.tfvars to use on-demand while waiting
+  # for spot quota approval (Service Quotas > "All G and VT Spot Instance Requests").
+  dynamic "instance_market_options" {
+    for_each = var.use_spot ? [1] : []
+    content {
+      market_type = "spot"
+      spot_options {
+        max_price                      = var.spot_max_price
+        spot_instance_type             = "persistent"
+        instance_interruption_behavior = "stop"
+      }
     }
   }
 
