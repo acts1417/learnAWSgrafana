@@ -47,6 +47,12 @@ variable "grafana_admin_password" {
   }
 }
 
+variable "use_spot" {
+  description = "true = spot instance (~$0.18/hr), false = on-demand (~$0.53/hr). Set to false while waiting for spot quota approval."
+  type        = bool
+  default     = true
+}
+
 variable "repo_url" {
   description = "Git URL of this repo — cloned to the instance at first boot."
   type        = string
