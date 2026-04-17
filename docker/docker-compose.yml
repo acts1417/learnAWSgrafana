@@ -5,7 +5,7 @@ services:
   # BOINC detects other CUDA processes and backs off when GPU is busy.
   # GPU tag: amd64-nvidia enables CUDA crunching (CPU-only tag = "latest")
   boinc:
-    image: boinc/client:amd64-nvidia
+    image: boinc/client:nvidia
     container_name: boinc
     restart: unless-stopped
     environment:
