@@ -87,7 +87,7 @@ services:
   # ── NVIDIA GPU Exporter ───────────────────────────────────────────────────────
   # Exposes nvidia-smi metrics (utilization, memory, temperature, power) to Prometheus.
   nvidia-gpu-exporter:
-    image: utkuozdemir/nvidia_gpu_exporter:1.2.0
+    image: utkuozdemir/nvidia_gpu_exporter:latest
     container_name: nvidia-gpu-exporter
     restart: unless-stopped
     deploy:
