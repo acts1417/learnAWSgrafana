@@ -74,6 +74,32 @@ cd "$${REPO_DIR}/docker"
 docker compose pull
 docker compose up -d
 
+# ── Docker Compose boot service ──────────────────────────────────────────────
+# Ensures the stack restarts after any stop/start (weekend shutdowns, spot reclaim).
+# Docker's own restart: unless-stopped handles container crashes, but this
+# service guarantees docker compose up runs on every OS boot as a safety net.
+cat > /etc/systemd/system/lab-stack.service <<UNIT
+[Unit]
+Description=Lab Docker Compose Stack
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=$${REPO_DIR}/docker
+ExecStart=/usr/bin/docker compose up -d
+ExecStop=/usr/bin/docker compose stop
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable lab-stack
+
 # ── Spot termination monitor ──────────────────────────────────────────────────
 cp "$${REPO_DIR}/scripts/spot-termination-monitor.sh" /usr/local/bin/
 chmod +x /usr/local/bin/spot-termination-monitor.sh
