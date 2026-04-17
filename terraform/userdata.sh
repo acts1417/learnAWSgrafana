@@ -35,7 +35,8 @@ fi
 # Allows Docker containers to access the GPU via --gpus / deploy.resources
 echo "Installing nvidia-container-toolkit..."
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
-  | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+  | gpg --batch --yes --no-tty --dearmor \
+        -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
 DISTRO=$(. /etc/os-release && echo "$${ID}$${VERSION_ID}")
 curl -sL "https://nvidia.github.io/libnvidia-container/$${DISTRO}/libnvidia-container.list" \
