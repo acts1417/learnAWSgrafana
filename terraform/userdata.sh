@@ -52,6 +52,10 @@ systemctl restart docker
 REPO_DIR=/opt/lab
 BRANCH="claude/setup-aws-boinc-grafana-digQH"
 
+# GIT_TERMINAL_PROMPT=0 prevents git from hanging waiting for credentials
+# in a headless environment. Requires the repo to be public.
+export GIT_TERMINAL_PROMPT=0
+
 echo "Cloning repo to $${REPO_DIR}..."
 if [ -d "$${REPO_DIR}/.git" ]; then
   git -C "$${REPO_DIR}" fetch origin
