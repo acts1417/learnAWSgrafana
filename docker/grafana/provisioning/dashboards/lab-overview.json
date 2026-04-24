@@ -11,7 +11,7 @@
       "title": "GPU Utilization %",
       "type": "timeseries",
       "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
@@ -40,7 +40,7 @@
       "title": "GPU Memory Used",
       "type": "timeseries",
       "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
@@ -64,7 +64,7 @@
       "title": "GPU Temperature (°C)",
       "type": "gauge",
       "gridPos": { "x": 0, "y": 8, "w": 6, "h": 6 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "celsius",
@@ -92,7 +92,7 @@
       "title": "GPU Power Draw (W)",
       "type": "gauge",
       "gridPos": { "x": 6, "y": 8, "w": 6, "h": 6 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "watt",
@@ -120,7 +120,7 @@
       "title": "CPU Utilization %",
       "type": "gauge",
       "gridPos": { "x": 12, "y": 8, "w": 6, "h": 6 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
@@ -148,7 +148,7 @@
       "title": "RAM Utilization %",
       "type": "gauge",
       "gridPos": { "x": 18, "y": 8, "w": 6, "h": 6 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
@@ -176,7 +176,7 @@
       "title": "CPU & RAM over time",
       "type": "timeseries",
       "gridPos": { "x": 0, "y": 14, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
@@ -201,7 +201,7 @@
       "title": "Disk Usage %",
       "type": "timeseries",
       "gridPos": { "x": 12, "y": 14, "w": 12, "h": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": null,
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
