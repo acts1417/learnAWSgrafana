@@ -19,9 +19,22 @@ g4dn.xlarge (spot instance) — running 24/7
 ├── BOINC client (24/7, uses GPU/CPU when Ollama is idle)
 ├── Ollama (started on demand for LLM sessions)
 ├── Open WebUI (browser-based chat frontend)
-├── Prometheus + nvidia_gpu_exporter + boinc_exporter
+├── Prometheus + nvidia_gpu_exporter + node_exporter
 └── Grafana (dashboards for GPU, BOINC, Ollama metrics)
 ```
+
+### Storage Layout
+
+```
+/dev/nvme0n1  →  /          (root EBS, 30GB — OS only)
+/dev/nvme2n1  →  /data      (data EBS, 150GB — Docker, models, BOINC, Grafana)
+/dev/nvme1n1  →  /opt/dlami/nvme  (ephemeral NVMe — DO NOT use for Docker)
+```
+
+**Lesson learned:** LLM models are 4–8GB each. Docker images for the full stack
+are ~20GB. The root volume fills fast. All Docker data, Ollama models, BOINC
+checkpoints, and Prometheus metrics must live on the dedicated data EBS volume
+(`/data`) which persists across instance stops and restarts.
 
 ### Access Pattern
 ```
@@ -38,11 +51,17 @@ Your laptop
 | Item | $/month |
 |---|---|
 | g4dn.xlarge spot 24/7 (~$0.18/hr) | ~$130 |
-| EBS storage 50GB gp3 | ~$4 |
+| EBS root 30GB gp3 | ~$2.40 |
+| EBS data 150GB gp3 | ~$12 |
 | Data transfer | ~$5 |
-| **Total** | **~$139** |
+| **Total** | **~$149** |
 
-~$61 under $200 budget — comfortable margin for spot price spikes.
+~$51 under $200 budget. The larger data volume eliminates the disk-full issues
+that occur when pulling LLM models onto the root volume.
+
+**Monthly rebuild:** AWS credits reset on the 1st. Terminate the instance and
+re-provision. The data EBS volume can be snapshotted before termination to
+preserve downloaded models and BOINC checkpoints, saving re-download time.
 
 ---
 
@@ -120,16 +139,24 @@ From simple to advanced (good learning progression):
 
 ---
 
-## Docker Compose Starting Point
+## Docker Compose
 
-*Ask Claude to generate the full file — this is a reminder of what to include:*
+See `docker-compose.yml` and `prometheus/prometheus.yml` in this repo.
 
-- `ollama` service (GPU passthrough)
-- `open-webui` service
-- `prometheus` service
-- `grafana` service
-- `boinc` service with PVC-equivalent volume for checkpoint data
-- Shared bridge network
+Services: `ollama`, `open-webui`, `boinc`, `node-exporter`,
+`nvidia-gpu-exporter`, `prometheus`, `grafana`.
+
+All persistent volumes are bind-mounted under `/data` (the dedicated EBS volume).
+
+**First-time setup on a new instance:**
+```bash
+sudo ./scripts/bootstrap.sh /dev/nvme2n1   # pass your data EBS device
+```
+
+**Subsequent starts after bootstrap:**
+```bash
+cd /opt/lab/docker && docker compose up -d
+```
 
 ---
 
@@ -174,10 +201,24 @@ From simple to advanced (good learning progression):
 
 ---
 
-## Next Steps (pick up here)
+## Lessons Learned (Month 1)
 
-1. Ask Claude to generate the **Docker Compose file** for the full stack
-2. Ask Claude to generate the **VPC + security group Terraform/OpenTofu config**
-3. Ask Claude to generate the **spot termination detection script**
-4. Decide on a BOINC project (Folding@home, World Community Grid, etc.)
+| Problem | Root Cause | Fix |
+|---|---|---|
+| No CPU/GPU in Grafana | WCG scheduled maintenance; no work units | Wait; BOINC auto-recovers |
+| No space left on device | Docker images filled 78GB root volume | Dedicated 150GB data EBS for Docker |
+| NVMe data lost on stop | Instance store is ephemeral | Never use NVMe for Docker data |
+| New IP on every start | No Elastic IP assigned | Allocate and associate an Elastic IP |
+| `RequestExpired` AWS CLI | Temp credentials expired (STS/SSO) | `aws sso login` to refresh |
+| `docker compose` needs sudo | ubuntu not in docker group | `sudo usermod -aG docker ubuntu` |
+
+---
+
+## Next Steps
+
+1. Add **Elastic IP** to Terraform config so the instance IP is stable across restarts
+2. Add **second EBS volume** (150GB gp3) to Terraform config, attached at `/dev/sdf`
+3. Generate the **VPC + security group Terraform/OpenTofu config**
+4. Generate the **spot termination detection script** (`scripts/spot-watch.sh`)
+5. Build Grafana dashboards: GPU utilization, VRAM, node metrics
 
