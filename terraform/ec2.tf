@@ -94,6 +94,6 @@ resource "aws_instance" "lab" {
   tags = { Name = "lab-boinc-grafana" }
 
   lifecycle {
-    ignore_changes = [user_data] # Prevent replacement on userdata-only changes
+    ignore_changes = [user_data, ami] # Prevent replacement on userdata or new DLAMI publish
   }
 }
