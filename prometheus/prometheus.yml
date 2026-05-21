@@ -11,6 +11,10 @@ scrape_configs:
     static_configs:
       - targets: ['dcgm-exporter:9400']
 
+  - job_name: gpu-processes
+    static_configs:
+      - targets: ['gpu-process-exporter:9401']
+
   - job_name: prometheus
     static_configs:
       - targets: ['localhost:9090']

@@ -71,6 +71,22 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
 
+  gpu-process-exporter:
+    build:
+      context: .
+      dockerfile: docker/gpu-process-exporter/Dockerfile
+    container_name: gpu-process-exporter
+    restart: unless-stopped
+    ports:
+      - "9401:9401"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
   dcgm-exporter:
     image: nvcr.io/nvidia/k8s/dcgm-exporter:latest
     container_name: dcgm-exporter
