@@ -16,6 +16,17 @@ DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
   -o Dpkg::Options::="--force-confold"
 apt-get install -y git curl ca-certificates gnupg
 
+# ── DLAMI CUDA cleanup ────────────────────────────────────────────────────────
+# DLAMI ships with 4 CUDA toolkit versions (~41GB total). Containers bring their
+# own CUDA libs; only the driver is needed on the host. Keep the newest, drop the rest.
+echo "Cleaning up old CUDA toolkit versions..."
+for ver in 12.6 12.8 12.9; do
+  if [ -d "/usr/local/cuda-$${ver}" ]; then
+    rm -rf "/usr/local/cuda-$${ver}"
+    echo "  removed cuda-$${ver}"
+  fi
+done
+
 # ── Docker ───────────────────────────────────────────────────────────────────
 # The DLAMI may already have Docker, but we ensure it's present and up to date.
 if ! command -v docker &>/dev/null; then
