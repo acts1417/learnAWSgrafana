@@ -1,0 +1,1645 @@
+{
+  "uid": "nvidia-gpu-metrics",
+  "title": "Nvidia GPU Metrics",
+  "annotations": [
+    {
+      "kind": "AnnotationQuery",
+      "spec": {
+        "builtIn": true,
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "query": {
+          "datasource": { "name": "grafana" },
+          "group": "grafana",
+          "kind": "DataQuery",
+          "spec": {},
+          "version": "v0"
+        }
+      }
+    }
+  ],
+  "cursorSync": "Off",
+  "description": "Nvidia GPU Metrics based on the prometheus metrics from github.com/utkuozdemir/nvidia_gpu_exporter",
+  "editable": true,
+  "elements": {
+    "panel-10": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_utilization_gpu_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Percent of time over the past sample period during which one or more kernels was executing on the GPU.",
+        "id": 10,
+        "links": [],
+        "title": "GPU Utilization %",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "line+area" }
+                },
+                "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "transparent", "value": 0 },
+                    { "color": "orange", "value": 0.7 },
+                    { "color": "red", "value": 0.9 }
+                  ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-11": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_utilization_memory_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Percent of time over the past sample period during which global (device) memory was being read or written.",
+        "id": 11,
+        "links": [],
+        "title": "Memory Utilization %",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "line+area" }
+                },
+                "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "transparent", "value": 0 },
+                    { "color": "orange", "value": 0.7 },
+                    { "color": "red", "value": 0.9 }
+                  ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-12": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_graphics_clock_hz{uuid=\"$gpu\"}", "format": "time_series", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current frequency of graphics (shader) clock.",
+        "id": 12,
+        "links": [],
+        "title": "Graphics Clock Speed",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "hertz"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-14": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_gpu_info{uuid=\"$gpu\"}", "instant": true, "interval": "", "legendFormat": "{{driver_version}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The version of the installed NVIDIA display driver.",
+        "id": 14,
+        "links": [],
+        "title": "Driver Version",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "decimals": 2,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 } ] },
+                "unit": "none"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "showPercentChange": false, "text": {}, "textMode": "name", "wideLayout": true
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-15": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_temperature_gpu{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Core GPU temperature in degrees C.",
+        "id": 15,
+        "links": [],
+        "title": "Temperature",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "line+area" }
+                },
+                "max": 100, "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "transparent", "value": 0 },
+                    { "color": "orange", "value": 70 },
+                    { "color": "red", "value": 80 }
+                  ]
+                },
+                "unit": "celsius"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-16": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_temperature_gpu{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Core GPU temperature in degrees C.",
+        "id": 16,
+        "links": [],
+        "title": "Temperature",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 100, "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": 0 },
+                    { "color": "#EAB839", "value": 70 },
+                    { "color": "red", "value": 80 }
+                  ]
+                },
+                "unit": "celsius"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75,
+              "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-17": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_memory_used_bytes{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Total memory allocated by active contexts.",
+        "id": 17,
+        "links": [],
+        "title": "Memory Allocation",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "decbytes"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-18": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_memory_clock_hz{uuid=\"$gpu\"}", "format": "time_series", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current frequency of memory clock.",
+        "id": 18,
+        "links": [],
+        "title": "Memory Clock Speed",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "hertz"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-19": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_video_clock_hz{uuid=\"$gpu\"}", "format": "time_series", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current frequency of video encoder/decoder clock.",
+        "id": 19,
+        "links": [],
+        "title": "Video Clock Speed",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "hertz"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-20": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_graphics_clock_hz{uuid=\"$gpu\"} / nvidia_smi_clocks_max_graphics_clock_hz{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current / Maximum frequency of graphics (shader) clock.",
+        "id": 20,
+        "links": [],
+        "title": "GPU Clock Speed %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-21": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_power_draw_watts{uuid=\"$gpu\"} / nvidia_smi_power_default_limit_watts{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Power draw as a percentage of the software power limit.",
+        "id": 21,
+        "links": [],
+        "title": "Power Draw %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-22": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_pstate{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The current performance state for the GPU. States range from P0 (maximum performance) to P12 (minimum performance).",
+        "id": 22,
+        "links": [],
+        "title": "P-State",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "decimals": 0,
+                "mappings": [ { "options": { "": { "text": "" } }, "type": "value" } ],
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 } ] },
+                "unit": "prefix:P"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "showPercentChange": false, "text": {}, "textMode": "value", "wideLayout": true
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-23": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_gpu_info{uuid=\"$gpu\"}", "instant": true, "interval": "", "legendFormat": "{{name}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The official product name of the GPU.",
+        "id": 23,
+        "links": [],
+        "title": "Name",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "decimals": 2,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 } ] },
+                "unit": "none"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "showPercentChange": false, "text": {}, "textMode": "name", "wideLayout": true
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-24": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_sm_clock_hz{uuid=\"$gpu\"}", "format": "time_series", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current frequency of SM (Streaming Multiprocessor) clock.",
+        "id": 24,
+        "links": [],
+        "title": "SM Clock Speed",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "hertz"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-25": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_memory_used_bytes{uuid=\"$gpu\"} / nvidia_smi_memory_total_bytes{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Total memory allocated by active contexts / Total installed GPU memory.",
+        "id": 25,
+        "links": [],
+        "title": "Memory Allocation %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-32": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_gpu_idle{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_gpu_idle{uuid=\"$gpu\"}", "instant": false, "interval": "", "legendFormat": "Idle" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_hw_thermal_slowdown{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_hw_thermal_slowdown{uuid=\"$gpu\"}", "interval": "", "legendFormat": "HW Thermal Slowdown" },
+                    "version": "v0"
+                  },
+                  "refId": "B"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_sw_power_cap{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_sw_power_cap{uuid=\"$gpu\"}", "interval": "", "legendFormat": "SW Power Cap" },
+                    "version": "v0"
+                  },
+                  "refId": "C"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_applications_clocks_setting{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_applications_clocks_setting{uuid=\"$gpu\"}", "interval": "", "legendFormat": "App Clocks Setting" },
+                    "version": "v0"
+                  },
+                  "refId": "D"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_hw_power_brake_slowdown{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_hw_power_brake_slowdown{uuid=\"$gpu\"}", "interval": "", "legendFormat": "HW Power Brake" },
+                    "version": "v0"
+                  },
+                  "refId": "E"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_sw_thermal_slowdown{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_sw_thermal_slowdown{uuid=\"$gpu\"}", "interval": "", "legendFormat": "SW Thermal Slowdown" },
+                    "version": "v0"
+                  },
+                  "refId": "F"
+                }
+              },
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_event_reasons_sync_boost{uuid=\"$gpu\"} or nvidia_smi_clocks_throttle_reasons_sync_boost{uuid=\"$gpu\"}", "interval": "", "legendFormat": "Sync Boost" },
+                    "version": "v0"
+                  },
+                  "refId": "G"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Information about factors that are reducing the frequency of clocks.",
+        "id": 32,
+        "links": [],
+        "title": "Throttle Reasons",
+        "vizConfig": {
+          "group": "bargauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "decimals": 0,
+                "mappings": [ { "options": { "0": { "text": "Not Active" }, "1": { "text": "Active" } }, "type": "value" } ],
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 } ] },
+                "unit": "none"
+              },
+              "overrides": []
+            },
+            "options": {
+              "displayMode": "gradient",
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "maxVizHeight": 300, "minVizHeight": 16, "minVizWidth": 8,
+              "namePlacement": "auto", "orientation": "horizontal",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "showUnfilled": true, "sizing": "auto", "text": {}, "valueMode": "color"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-33": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_clocks_current_memory_clock_hz{uuid=\"$gpu\"} / nvidia_smi_clocks_max_memory_clock_hz{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Current frequency of memory clock / Maximum frequency of memory clock.",
+        "id": 33,
+        "links": [],
+        "title": "Memory Clock Speed %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-34": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_gpu_info{uuid=\"$gpu\"}", "instant": true, "interval": "", "legendFormat": "{{vbios_version}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The BIOS of the GPU board.",
+        "id": 34,
+        "links": [],
+        "title": "Vbios Version",
+        "vizConfig": {
+          "group": "stat",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "decimals": 2,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 } ] },
+                "unit": "none"
+              },
+              "overrides": []
+            },
+            "options": {
+              "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto",
+              "percentChangeColorMode": "standard",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "showPercentChange": false, "text": {}, "textMode": "name", "wideLayout": true
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-4": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_fan_speed_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The fan speed value as a percent of maximum.",
+        "id": 4,
+        "links": [],
+        "title": "Fan Speed %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-6": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_utilization_gpu_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Percent of time over the past sample period during which one or more kernels was executing on the GPU.",
+        "id": 6,
+        "links": [],
+        "title": "GPU Utilization %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-7": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_utilization_memory_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "Percent of time over the past sample period during which global (device) memory was being read or written.",
+        "id": 7,
+        "links": [],
+        "title": "Memory Utilization %",
+        "vizConfig": {
+          "group": "gauge",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "thresholds" }, "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "percentage",
+                  "steps": [ { "color": "green", "value": 0 }, { "color": "#EAB839", "value": 70 }, { "color": "red", "value": 90 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "barShape": "flat", "barWidthFactor": 0.5,
+              "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+              "endpointMarker": "point", "minVizHeight": 75, "minVizWidth": 75, "orientation": "auto",
+              "reduceOptions": { "calcs": [ "last" ], "fields": "", "values": false },
+              "segmentCount": 1, "segmentSpacing": 0.3, "shape": "gauge",
+              "showThresholdLabels": false, "showThresholdMarkers": true,
+              "sizing": "auto", "sparkline": false, "text": {}, "textMode": "auto"
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-8": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_power_draw_watts{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The last measured power draw for the entire board, in watts.",
+        "id": 8,
+        "links": [],
+        "title": "Power Draw",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "off" }
+                },
+                "min": 0,
+                "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": 0 }, { "color": "red", "value": 80 } ] },
+                "unit": "watt"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    },
+    "panel-9": {
+      "kind": "Panel",
+      "spec": {
+        "data": {
+          "kind": "QueryGroup",
+          "spec": {
+            "queries": [
+              {
+                "kind": "PanelQuery",
+                "spec": {
+                  "hidden": false,
+                  "query": {
+                    "datasource": { "name": "Prometheus" },
+                    "group": "prometheus",
+                    "kind": "DataQuery",
+                    "spec": { "exemplar": true, "expr": "nvidia_smi_fan_speed_ratio{uuid=\"$gpu\"}", "interval": "", "legendFormat": "{{uuid}}" },
+                    "version": "v0"
+                  },
+                  "refId": "A"
+                }
+              }
+            ],
+            "queryOptions": {},
+            "transformations": []
+          }
+        },
+        "description": "The fan speed as a percent of maximum.",
+        "id": 9,
+        "links": [],
+        "title": "Fan Speed %",
+        "vizConfig": {
+          "group": "timeseries",
+          "kind": "VizConfig",
+          "spec": {
+            "fieldConfig": {
+              "defaults": {
+                "color": { "mode": "palette-classic" },
+                "custom": {
+                  "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
+                  "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "barWidthFactor": 0.6,
+                  "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none",
+                  "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                  "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                  "pointSize": 5, "scaleDistribution": { "type": "linear" },
+                  "showPoints": "never", "showValues": false, "spanNulls": false,
+                  "stacking": { "group": "A", "mode": "none" },
+                  "thresholdsStyle": { "mode": "line+area" }
+                },
+                "max": 1, "min": 0,
+                "thresholds": {
+                  "mode": "absolute",
+                  "steps": [ { "color": "transparent", "value": 0 }, { "color": "orange", "value": 0.7 }, { "color": "red", "value": 0.9 } ]
+                },
+                "unit": "percentunit"
+              },
+              "overrides": []
+            },
+            "options": {
+              "annotations": { "clustering": -1, "multiLane": false },
+              "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": false },
+              "tooltip": { "hideZeros": false, "mode": "multi", "sort": "none" }
+            }
+          },
+          "version": "13.0.2"
+        }
+      }
+    }
+  },
+  "layout": {
+    "kind": "GridLayout",
+    "spec": {
+      "items": [
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-23" }, "height": 3, "width": 4, "x": 0, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-22" }, "height": 3, "width": 2, "x": 4, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-6" }, "height": 5, "width": 3, "x": 6, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-21" }, "height": 5, "width": 3, "x": 9, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-4" }, "height": 5, "width": 3, "x": 12, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-16" }, "height": 5, "width": 3, "x": 15, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-11" }, "height": 5, "width": 6, "x": 18, "y": 0 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-14" }, "height": 2, "width": 3, "x": 0, "y": 3 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-34" }, "height": 2, "width": 3, "x": 3, "y": 3 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-32" }, "height": 5, "width": 6, "x": 0, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-20" }, "height": 5, "width": 3, "x": 6, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-33" }, "height": 5, "width": 3, "x": 9, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-25" }, "height": 5, "width": 3, "x": 12, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-7" }, "height": 5, "width": 3, "x": 15, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-10" }, "height": 5, "width": 6, "x": 18, "y": 5 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-17" }, "height": 5, "width": 6, "x": 0, "y": 10 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-15" }, "height": 5, "width": 6, "x": 6, "y": 10 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-8" }, "height": 5, "width": 6, "x": 12, "y": 10 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-9" }, "height": 5, "width": 6, "x": 18, "y": 10 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-12" }, "height": 5, "width": 6, "x": 0, "y": 15 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-19" }, "height": 5, "width": 6, "x": 6, "y": 15 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-24" }, "height": 5, "width": 6, "x": 12, "y": 15 } },
+        { "kind": "GridLayoutItem", "spec": { "element": { "kind": "ElementReference", "name": "panel-18" }, "height": 5, "width": 6, "x": 18, "y": 15 } }
+      ]
+    }
+  },
+  "links": [],
+  "liveNow": false,
+  "preload": false,
+  "tags": [ "nvidia", "nvidia-smi", "nvidia_gpu_exporter", "prometheus" ],
+  "timeSettings": {
+    "autoRefresh": "10s",
+    "autoRefreshIntervals": [ "5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d" ],
+    "fiscalYearStartMonth": 0,
+    "from": "now-30m",
+    "hideTimepicker": false,
+    "timezone": "browser",
+    "to": "now"
+  },
+  "variables": [
+    {
+      "kind": "QueryVariable",
+      "spec": {
+        "allowCustomValue": true,
+        "current": {},
+        "definition": "label_values(nvidia_smi_index,job)",
+        "hide": "dontHide",
+        "includeAll": false,
+        "label": "Job",
+        "multi": false,
+        "name": "job",
+        "options": [],
+        "query": {
+          "datasource": { "name": "Prometheus" },
+          "group": "prometheus",
+          "kind": "DataQuery",
+          "spec": { "query": "label_values(nvidia_smi_index,job)", "refId": "Prometheus-job-Variable-Query" },
+          "version": "v0"
+        },
+        "refresh": "onDashboardLoad",
+        "regex": "",
+        "regexApplyTo": "value",
+        "skipUrlSync": false,
+        "sort": "disabled"
+      }
+    },
+    {
+      "kind": "QueryVariable",
+      "spec": {
+        "allowCustomValue": true,
+        "current": {},
+        "definition": "label_values(nvidia_smi_index{job=\"$job\"},instance)",
+        "hide": "dontHide",
+        "includeAll": false,
+        "label": "Host",
+        "multi": false,
+        "name": "node",
+        "options": [],
+        "query": {
+          "datasource": { "name": "Prometheus" },
+          "group": "prometheus",
+          "kind": "DataQuery",
+          "spec": { "query": "label_values(nvidia_smi_index{job=\"$job\"},instance)", "refId": "Prometheus-node-Variable-Query" },
+          "version": "v0"
+        },
+        "refresh": "onDashboardLoad",
+        "regex": "",
+        "regexApplyTo": "value",
+        "skipUrlSync": false,
+        "sort": "disabled"
+      }
+    },
+    {
+      "kind": "QueryVariable",
+      "spec": {
+        "allowCustomValue": true,
+        "current": {},
+        "definition": "label_values(nvidia_smi_index{instance=\"$node\"},uuid)",
+        "hide": "dontHide",
+        "includeAll": false,
+        "label": "GPU",
+        "multi": false,
+        "name": "gpu",
+        "options": [],
+        "query": {
+          "datasource": { "name": "Prometheus" },
+          "group": "prometheus",
+          "kind": "DataQuery",
+          "spec": { "query": "label_values(nvidia_smi_index{instance=\"$node\"},uuid)", "refId": "StandardVariableQuery" },
+          "version": "v0"
+        },
+        "refresh": "onDashboardLoad",
+        "regex": "",
+        "regexApplyTo": "value",
+        "skipUrlSync": false,
+        "sort": "alphabeticalAsc"
+      }
+    }
+  ]
+}

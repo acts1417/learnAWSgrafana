@@ -93,7 +93,7 @@ services:
     # Explicit field list excludes broken clocks_event_reasons_counters [us] fields
     # returned by newer NVIDIA drivers that contain spaces/brackets invalid in Prometheus.
     command:
-      - --query-field-names=utilization.gpu,utilization.memory,memory.total,memory.free,memory.used,temperature.gpu,power.draw,clocks.current.graphics,clocks.current.memory,pstate,name,driver_version
+      - --query-field-names=index,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used,temperature.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,clocks.current.sm,clocks.current.video,clocks.max.graphics,clocks.max.memory,pstate,name,driver_version
     deploy:
       resources:
         reservations:
