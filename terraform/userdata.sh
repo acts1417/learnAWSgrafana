@@ -119,31 +119,9 @@ systemctl daemon-reload
 systemctl enable lab-stack
 
 # ── Spot termination monitor ──────────────────────────────────────────────────
-cp "$${REPO_DIR}/scripts/spot-termination-monitor.sh" /usr/local/bin/
-chmod +x /usr/local/bin/spot-termination-monitor.sh
-
-cat > /etc/systemd/system/spot-termination-monitor.service <<'UNIT'
-[Unit]
-Description=AWS Spot Instance Termination Monitor
-After=network.target docker.service
-Requires=docker.service
-
-[Service]
-Type=simple
-EnvironmentFile=/opt/lab/docker/.env
-ExecStart=/usr/local/bin/spot-termination-monitor.sh
-Restart=always
-RestartSec=5
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-UNIT
-
-systemctl daemon-reload
-systemctl enable spot-termination-monitor
-systemctl start spot-termination-monitor
+# On-demand instances don't receive spot interruption notices so the monitor
+# is not installed. The script is kept in scripts/ for reference if spot is
+# ever re-enabled (set use_spot = true in terraform.tfvars).
 
 echo "========================================================"
 echo "Lab setup complete: $(date)"

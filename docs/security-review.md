@@ -22,7 +22,7 @@ Standard: FedRAMP alignment + least-privilege
 |----|--------|------|-------|-------------|
 | H1 | ✅ | `docker-compose.yml:58` | `WEBUI_SECRET_KEY` hardcoded in repo | Moved to `.env`; generated with `openssl rand -hex 32` in userdata.sh |
 | H2 | ✅ | `docker-compose.yml:12,135` | `:-changeme` fallbacks silently use weak password if `.env` absent | Removed defaults — Docker Compose now hard-fails if `.env` missing |
-| H3 | ✅ | `spot-termination-monitor.service` | Systemd unit missing `EnvironmentFile=` — BOINC password fell back to `changeme` at shutdown | Added `EnvironmentFile=/opt/lab/docker/.env` to unit; removed `:-changeme` from script |
+| H3 | ✅ | `spot-termination-monitor.service` | Systemd unit missing `EnvironmentFile=` — BOINC password fell back to `changeme` at shutdown | Fixed in script; service no longer installed — switched permanently to on-demand (org weekend shutdown policy made spot unreliable) |
 | H4 | ✅ | `terraform/userdata.sh:6` | `/var/log/userdata.log` created world-readable; `set -x` would expose secrets | Added `chmod 600 /var/log/userdata.log` immediately after `exec >>` |
 
 ---
