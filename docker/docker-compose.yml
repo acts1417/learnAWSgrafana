@@ -9,7 +9,7 @@ services:
     container_name: boinc
     restart: unless-stopped
     environment:
-      - BOINC_GUI_RPC_PASSWORD=${BOINC_RPC_PASSWORD:-changeme}
+      - BOINC_GUI_RPC_PASSWORD=${BOINC_RPC_PASSWORD}
       - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
     volumes:
       - boinc_data:/var/lib/boinc
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - WEBUI_SECRET_KEY=changeme-use-a-random-string
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
     volumes:
       - open_webui_data:/app/backend/data
     depends_on:
@@ -132,7 +132,7 @@ services:
     container_name: grafana
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
     volumes:
