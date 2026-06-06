@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ShellCheck — scripts
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: ./scripts
+
+      - name: ShellCheck — userdata.sh
+        # SC2154: vars like ${boinc_password} are Terraform template vars, not shell vars
+        run: shellcheck --exclude=SC2154 terraform/userdata.sh
+
+  validate-json:
+    name: Validate JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Grafana dashboard JSON
+        run: |
+          fail=0
+          for f in docker/grafana/provisioning/dashboards/*.json; do
+            if python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "  OK  $f"
+            else
+              echo "FAIL  $f"
+              fail=1
+            fi
+          done
+          exit $fail
