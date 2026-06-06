@@ -48,9 +48,9 @@ variable "grafana_admin_password" {
 }
 
 variable "use_spot" {
-  description = "true = spot instance (~$0.18/hr), false = on-demand (~$0.53/hr). Set to false while waiting for spot quota approval."
+  description = "true = spot instance (~$0.18/hr), false = on-demand (~$0.53/hr). Spot was abandoned due to org weekend shutdown policy causing IncorrectSpotRequestState. Default is on-demand."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "repo_url" {
