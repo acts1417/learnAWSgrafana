@@ -4,6 +4,7 @@
 #   sudo tail -f /var/log/userdata.log
 set -euo pipefail
 exec >> /var/log/userdata.log 2>&1
+chmod 600 /var/log/userdata.log
 
 echo "========================================================"
 echo "Lab setup started: $(date)"
@@ -81,6 +82,7 @@ fi
 cat > "$${REPO_DIR}/docker/.env" <<ENV
 BOINC_RPC_PASSWORD=${boinc_password}
 GRAFANA_ADMIN_PASSWORD=${grafana_admin_password}
+WEBUI_SECRET_KEY=$(openssl rand -hex 32)
 ENV
 chmod 600 "$${REPO_DIR}/docker/.env"
 
@@ -128,6 +130,7 @@ Requires=docker.service
 
 [Service]
 Type=simple
+EnvironmentFile=/opt/lab/docker/.env
 ExecStart=/usr/local/bin/spot-termination-monitor.sh
 Restart=always
 RestartSec=5

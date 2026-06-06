@@ -48,7 +48,7 @@ while true; do
     log "Checkpointing BOINC..."
     docker exec "$BOINC_CONTAINER" boinccmd \
       --host localhost \
-      --passwd "${BOINC_RPC_PASSWORD:-changeme}" \
+      --passwd "${BOINC_RPC_PASSWORD}" \
       --quit 2>/dev/null || true
 
     # Give BOINC a moment to write its checkpoint files to the EBS volume
