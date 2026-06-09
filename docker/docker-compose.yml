@@ -1,0 +1,167 @@
+services:
+
+  # ── BOINC client ────────────────────────────────────────────────────────────
+  # Runs science workloads 24/7, sharing the GPU with Ollama.
+  # BOINC detects other CUDA processes and backs off when GPU is busy.
+  # No versioned tags published — nvidia tag last updated 2025-05-04, no known CVEs.
+  # Pin by digest for reproducibility; verify digest at hub.docker.com/r/boinc/client/tags
+  boinc:
+    image: boinc/client:nvidia
+    container_name: boinc
+    restart: unless-stopped
+    environment:
+      - BOINC_GUI_RPC_PASSWORD=${BOINC_RPC_PASSWORD}
+      - BOINC_CMD_LINE_OPTIONS=--allow_remote_gui_rpc
+    volumes:
+      - boinc_data:/var/lib/boinc
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:31416:31416" # BOINC GUI RPC — localhost only, SSH-tunnel to manage
+
+  # ── Ollama ──────────────────────────────────────────────────────────────────
+  # LLM inference server. Start/stop on demand to reclaim GPU for BOINC.
+  # Pull a model: docker exec ollama ollama pull llama3.2
+  # v0.23.2 released 2026-05-07 — no published CVEs.
+  ollama:
+    image: ollama/ollama:0.23.2
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:11434:11434" # Ollama API — localhost only
+
+  # ── Open WebUI ───────────────────────────────────────────────────────────────
+  # Browser-based chat frontend for Ollama.
+  # Access: http://<public-ip>:8080
+  # v0.9.5 released 2026-05-10 — patches Critical LDAP auth bypass (GHSA-2r4p-jpmg-48f4)
+  # and multiple High XSS/access-control CVEs present in v0.9.4 and earlier.
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.9.5
+    container_name: open-webui
+    restart: unless-stopped
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+    volumes:
+      - open_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    networks:
+      - lab
+    ports:
+      - "0.0.0.0:8080:8080"
+
+  # ── Node Exporter ────────────────────────────────────────────────────────────
+  # System metrics: CPU, memory, disk, network.
+  # v1.11.1 released 2026-04-07 — no known CVEs.
+  node-exporter:
+    image: prom/node-exporter:v1.11.1
+    container_name: node-exporter
+    restart: unless-stopped
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    networks:
+      - lab
+
+  # ── NVIDIA GPU Exporter ───────────────────────────────────────────────────────
+  # Exposes nvidia-smi metrics (utilization, memory, temperature, power) to Prometheus.
+  # v1.3.0 already pinned — no newer release available.
+  nvidia-gpu-exporter:
+    image: utkuozdemir/nvidia_gpu_exporter:1.3.0
+    container_name: nvidia-gpu-exporter
+    restart: unless-stopped
+    # Explicit field list excludes broken clocks_event_reasons_counters [us] fields
+    # returned by newer NVIDIA drivers that contain spaces/brackets invalid in Prometheus.
+    command:
+      - --query-field-names=index,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used,temperature.gpu,power.draw,power.limit,fan.speed,clocks.current.graphics,clocks.current.memory,clocks.current.sm,clocks.current.video,clocks.max.graphics,clocks.max.memory,pstate,name,driver_version
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+    networks:
+      - lab
+
+  # ── Prometheus ───────────────────────────────────────────────────────────────
+  # Scrapes metrics from node-exporter, nvidia-gpu-exporter (and boinc_exporter later).
+  # UI: http://localhost:9090 (SSH tunnel required)
+  # v3.11.3 released 2026-04-27 — security release fixing CVE-2026-42151 (Azure AD secret
+  # exposure), CVE-2026-42154 (remote-read DoS), and stored XSS in heatmap chart.
+  prometheus:
+    image: prom/prometheus:v3.11.3
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    networks:
+      - lab
+    ports:
+      - "127.0.0.1:9090:9090" # localhost only
+
+  # ── Grafana ──────────────────────────────────────────────────────────────────
+  # Dashboards for GPU, system, and BOINC metrics.
+  # Access: http://<public-ip>:3000  (admin / <GRAFANA_ADMIN_PASSWORD>)
+  # v13.0.1 released 2026-04-17. Security patch +security-01 (2026-05-12) fixes 10 CVEs
+  # including High auth/XSS issues; Critical CVE-2026-27876 (RCE) is Enterprise-only.
+  grafana:
+    image: grafana/grafana:13.0.1
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - lab
+    ports:
+      - "0.0.0.0:3000:3000"
+
+volumes:
+  boinc_data:
+  ollama_data:
+  open_webui_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  lab:
+    driver: bridge

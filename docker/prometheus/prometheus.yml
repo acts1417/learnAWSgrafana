@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # System metrics (CPU, RAM, disk, network)
+  - job_name: node
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # GPU metrics (utilization, VRAM, temp, power draw)
+  - job_name: nvidia_gpu
+    static_configs:
+      - targets: ['nvidia-gpu-exporter:9835']
+
+  # BOINC exporter — uncomment in Month 2 after adding the boinc_exporter service
+  # - job_name: boinc
+  #   static_configs:
+  #     - targets: ['boinc-exporter:9100']
