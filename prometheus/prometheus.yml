@@ -15,6 +15,11 @@ scrape_configs:
     static_configs:
       - targets: ['gpu-process-exporter:9401']
 
+  - job_name: ollama
+    static_configs:
+      - targets: ['ollama:11434']
+    metrics_path: /metrics
+
   - job_name: prometheus
     static_configs:
       - targets: ['localhost:9090']
