@@ -430,7 +430,7 @@
         }
       ]
     }
-  ],
+  ,
     {
       "datasource": {"type": "prometheus", "uid": "prometheus"},
       "fieldConfig": {
