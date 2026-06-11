@@ -77,6 +77,10 @@ resource "aws_instance" "lab" {
     http_put_response_hop_limit = 1
   }
 
+  # Root volume holds only the OS + DLAMI driver. All Docker data (images,
+  # containers, named volumes = models/BOINC/Grafana/Prometheus) lives on the
+  # separate /data volume below — see userdata.sh, which relocates Docker's
+  # data-root there. This keeps the root volume from filling up.
   root_block_device {
     volume_size           = 80
     volume_type           = "gp3"
@@ -91,9 +95,46 @@ resource "aws_instance" "lab" {
     repo_url               = var.repo_url
   }))
 
-  tags = { Name = "lab-boinc-grafana" }
+  tags = {
+    Name          = "lab-boinc-grafana"
+    auto-schedule = "true" # Picked up by lab-start-ec2 Lambda (morning_start.tf)
+  }
 
   lifecycle {
     ignore_changes = [user_data, ami] # Prevent replacement on userdata or new DLAMI publish
   }
+}
+
+# ── Persistent data volume ────────────────────────────────────────────────────
+# Holds Docker's data-root (/data/docker): all images, containers, and named
+# volumes — which means Ollama models, BOINC checkpoints, Grafana, and Prometheus
+# data. Separate from the instance so it survives rebuilds and supports the
+# monthly snapshot/restore workflow.
+#
+# Monthly rebuild with model/data preservation:
+#   1. aws ec2 create-snapshot --volume-id <id> --description "lab-data-YYYY-MM"
+#   2. terraform destroy
+#   3. set data_volume_snapshot_id = "<snap-id>" in terraform.tfvars
+#   4. terraform apply   (volume restored from snapshot, models intact)
+resource "aws_ebs_volume" "data" {
+  availability_zone = aws_subnet.public.availability_zone
+  size              = var.data_volume_size
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = aws_kms_key.ebs.arn # CMK — FedRAMP SC-28
+
+  # When set, the volume is restored from a prior snapshot (preserves models/data).
+  snapshot_id = var.data_volume_snapshot_id != "" ? var.data_volume_snapshot_id : null
+
+  tags = { Name = "lab-data" }
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # Don't recreate volume if snapshot var changes later
+  }
+}
+
+resource "aws_volume_attachment" "data" {
+  device_name = "/dev/sdf" # Presents inside the instance as a /dev/nvme*n1 device
+  volume_id   = aws_ebs_volume.data.id
+  instance_id = aws_instance.lab.id
 }
