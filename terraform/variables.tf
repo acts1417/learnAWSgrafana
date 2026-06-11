@@ -58,3 +58,15 @@ variable "repo_url" {
   type        = string
   default     = "https://github.com/acts1417/learnawsgrafana.git"
 }
+
+variable "data_volume_size" {
+  description = "Size (GB) of the persistent /data EBS volume that holds Docker data-root: images, containers, and named volumes (Ollama models, BOINC, Grafana, Prometheus). 150GB fits several LLM models plus the full stack."
+  type        = number
+  default     = 150
+}
+
+variable "data_volume_snapshot_id" {
+  description = "Optional EBS snapshot ID to restore the /data volume from (preserves models/BOINC data across a monthly rebuild). Leave empty for a fresh blank volume."
+  type        = string
+  default     = ""
+}
