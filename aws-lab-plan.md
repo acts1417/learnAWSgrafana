@@ -26,15 +26,27 @@ g4dn.xlarge (spot instance) — running 24/7
 ### Storage Layout
 
 ```
-/dev/nvme0n1  →  /          (root EBS, 30GB — OS only)
-/dev/nvme2n1  →  /data      (data EBS, 150GB — Docker, models, BOINC, Grafana)
-/dev/nvme1n1  →  /opt/dlami/nvme  (ephemeral NVMe — DO NOT use for Docker)
+root EBS (80GB gp3)        →  /          OS + NVIDIA driver only
+data EBS (150GB gp3)       →  /data      Docker data-root (images, containers,
+                                          named volumes = models/BOINC/Grafana/Prom)
+instance-store NVMe        →  unused     ephemeral — DO NOT use for Docker
 ```
 
-**Lesson learned:** LLM models are 4–8GB each. Docker images for the full stack
-are ~20GB. The root volume fills fast. All Docker data, Ollama models, BOINC
-checkpoints, and Prometheus metrics must live on the dedicated data EBS volume
-(`/data`) which persists across instance stops and restarts.
+**This is now fully automated.** `terraform/userdata.sh` on first boot:
+1. Detects the data EBS volume by its Amazon EBS model string (skips the root
+   disk and the ephemeral instance-store NVMe — device names are not stable)
+2. Formats it ext4 only if blank (preserves data on a snapshot restore)
+3. Mounts at `/data`, persists in `/etc/fstab` by UUID
+4. Sets Docker `data-root` to `/data/docker` **before** any image pull
+
+Because the stack uses Docker **named volumes**, putting the data-root on `/data`
+automatically persists Ollama models, BOINC checkpoints, Grafana, and Prometheus
+on the data volume — no bind-mount juggling.
+
+**Lesson learned (the hard way):** LLM models are 4–8GB each and the full image
+set is ~20GB. With everything on the 80GB root volume it fills within days. The
+data-root relocation above is the fix; never put Docker on the instance-store
+NVMe (it's wiped on stop).
 
 ### Access Pattern
 ```
@@ -210,15 +222,49 @@ cd /opt/lab/docker && docker compose up -d
 | NVMe data lost on stop | Instance store is ephemeral | Never use NVMe for Docker data |
 | New IP on every start | No Elastic IP assigned | Allocate and associate an Elastic IP |
 | `RequestExpired` AWS CLI | Temp credentials expired (STS/SSO) | `aws sso login` to refresh |
-| `docker compose` needs sudo | ubuntu not in docker group | `sudo usermod -aG docker ubuntu` |
+| `docker compose` needs sudo | ubuntu not in docker group | userdata adds ubuntu to docker group |
+| Grafana datasource not found | provisioning not wired | datasource + dashboards auto-provisioned in `docker/grafana/provisioning` |
+| Grafana dashboard "No data" | malformed JSON / wrong metrics | dashboards validated; use `nvidia_smi_*` (community exporter) |
+| Two competing compose files | root + `docker/` copies | consolidated to a single `docker/` layout |
+| BOINC no GPU work | project sends CPU-only or maintenance | GPU projects: Einstein@home, Milkyway (separation app) |
+
+---
+
+## Monthly Rebuild Runbook
+
+AWS terminates all resources on the 1st (`Monthly-Expiration-Trigger`). To rebuild
+**and keep your Ollama models + BOINC data**, snapshot the data volume first:
+
+```bash
+# 1. Before month end — snapshot the data volume
+VOL=$(aws ec2 describe-volumes \
+  --filters "Name=tag:Name,Values=lab-data" \
+  --query "Volumes[0].VolumeId" --output text)
+aws ec2 create-snapshot --volume-id "$VOL" --description "lab-data-$(date +%Y-%m)"
+
+# 2. Tear down
+cd terraform && terraform destroy
+
+# 3. New month — restore from snapshot
+#    set in terraform.tfvars:  data_volume_snapshot_id = "snap-xxxxxxxx"
+terraform apply           # data volume restored, models intact
+
+# 4. (Fresh volume only) pull models again
+docker exec ollama ollama pull qwen3:14b
+```
+
+Leave `data_volume_snapshot_id = ""` for a clean blank volume.
+
+The instance is tagged `auto-schedule=true` so the morning-start Lambda finds it
+automatically — no manual tagging after rebuild.
 
 ---
 
 ## Next Steps
 
-1. Add **Elastic IP** to Terraform config so the instance IP is stable across restarts
-2. Add **second EBS volume** (150GB gp3) to Terraform config, attached at `/dev/sdf`
-3. Generate the **VPC + security group Terraform/OpenTofu config**
-4. Generate the **spot termination detection script** (`scripts/spot-watch.sh`)
-5. Build Grafana dashboards: GPU utilization, VRAM, node metrics
+1. Add **Elastic IP** so the instance IP is stable across restarts
+2. Per-process GPU panels are live (`gpu-process-attribution.json`) — extend with
+   Ollama token-rate panels once the Ollama `/metrics` endpoint is confirmed
+3. Wire the **spot termination monitor** if spot is ever re-enabled
+4. Month 4: OCP4 SNO / ROSA stretch goals
 
