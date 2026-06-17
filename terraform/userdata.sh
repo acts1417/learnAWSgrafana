@@ -29,9 +29,9 @@ for ver in 12.6 12.8 12.9; do
 done
 
 # ── Persistent data volume (/data) ────────────────────────────────────────────
-# A dedicated EBS volume (terraform aws_ebs_volume.data, attached at /dev/sdf)
+# A dedicated EBS volume (terraform aws_ebs_volume.data, attached at /dev/xvdf)
 # holds Docker's data-root so the 80GB root volume never fills with images/models.
-# On Nitro, /dev/sdf surfaces as some /dev/nvme*n1 — detect it by EBS model,
+# On Nitro, /dev/xvdf surfaces as some /dev/nvme*n1 — detect it by EBS model,
 # skipping the root disk and the ephemeral instance-store NVMe.
 DATA_MOUNT=/data
 
@@ -77,7 +77,7 @@ fi
 mkdir -p "$${DATA_MOUNT}"
 mount "$${DATA_DEV}" "$${DATA_MOUNT}"
 
-# Persist mount by UUID (device names can change across reboots)
+# Persist mount by UUID (more stable than device name or label across reboots)
 DATA_UUID=$(blkid -s UUID -o value "$${DATA_DEV}")
 if ! grep -q "$${DATA_UUID}" /etc/fstab; then
   echo "UUID=$${DATA_UUID}  $${DATA_MOUNT}  ext4  defaults,nofail  0  2" >> /etc/fstab
@@ -90,6 +90,7 @@ if ! command -v docker &>/dev/null; then
   echo "Installing Docker..."
   curl -fsSL https://get.docker.com | sh
 fi
+usermod -aG docker ubuntu
 
 # Point Docker's data-root at /data BEFORE it starts pulling images.
 mkdir -p /etc/docker
@@ -99,16 +100,14 @@ cat > /etc/docker/daemon.json <<JSON
 }
 JSON
 
-systemctl enable docker
-systemctl restart docker
-usermod -aG docker ubuntu
-
 # Docker Compose v2 plugin
 if ! docker compose version &>/dev/null 2>&1; then
   apt-get install -y docker-compose-plugin
 fi
 
 # ── NVIDIA Container Toolkit ─────────────────────────────────────────────────
+# Allows Docker containers to access the GPU via --gpus / deploy.resources.
+# nvidia-ctk merges nvidia runtime config into existing /etc/docker/daemon.json.
 echo "Installing nvidia-container-toolkit..."
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
   | gpg --batch --yes --no-tty --dearmor \
@@ -121,27 +120,28 @@ curl -sL "https://nvidia.github.io/libnvidia-container/$${DISTRO}/libnvidia-cont
 
 apt-get update -y
 apt-get install -y nvidia-container-toolkit
-nvidia-ctk runtime configure --runtime=docker
-systemctl restart docker
+nvidia-ctk runtime configure --runtime=docker  # merges nvidia runtime into daemon.json
+
+# Start Docker once — data-root and nvidia runtime both configured
+systemctl enable docker
+systemctl start docker
 
 # ── Clone repo ───────────────────────────────────────────────────────────────
 REPO_DIR=/opt/lab
 BRANCH="main"
 
-# GIT_TERMINAL_PROMPT=0 prevents git from hanging on credentials in a headless env.
+# GIT_TERMINAL_PROMPT=0 prevents git from hanging waiting for credentials
+# in a headless environment. Requires the repo to be public.
 export GIT_TERMINAL_PROMPT=0
 
 echo "Cloning repo to $${REPO_DIR}..."
 if [ -d "$${REPO_DIR}/.git" ]; then
-  git config --global --add safe.directory "$${REPO_DIR}"
   git -C "$${REPO_DIR}" fetch origin
   git -C "$${REPO_DIR}" checkout "$${BRANCH}"
   git -C "$${REPO_DIR}" pull origin "$${BRANCH}"
 else
   git clone --branch "$${BRANCH}" ${repo_url} "$${REPO_DIR}"
 fi
-git config --global --add safe.directory "$${REPO_DIR}"
-chown -R ubuntu:ubuntu "$${REPO_DIR}"
 
 # ── Environment file ─────────────────────────────────────────────────────────
 # Terraform renders these values at plan time — they never hit the git repo.
@@ -153,18 +153,19 @@ ENV
 chmod 600 "$${REPO_DIR}/docker/.env"
 
 # ── Start Docker Compose stack ────────────────────────────────────────────────
-echo "Building and pulling container images (this takes a few minutes)..."
+echo "Pulling container images (this takes a few minutes)..."
 cd "$${REPO_DIR}/docker"
-docker compose build
+docker compose pull
 docker compose up -d
 
 # ── Docker Compose boot service ──────────────────────────────────────────────
-# Restarts the stack on every OS boot (weekend shutdowns, instance start/stop).
-# Requires /data to be mounted first (the named volumes live there).
+# Ensures the stack restarts after any stop/start (weekend shutdowns, spot reclaim).
+# Docker's own restart: unless-stopped handles container crashes, but this
+# service guarantees docker compose up runs on every OS boot as a safety net.
 cat > /etc/systemd/system/lab-stack.service <<UNIT
 [Unit]
 Description=Lab Docker Compose Stack
-After=network-online.target docker.service data.mount
+After=network-online.target docker.service
 Wants=network-online.target
 Requires=docker.service
 
@@ -183,11 +184,13 @@ UNIT
 systemctl daemon-reload
 systemctl enable lab-stack
 
+# ── Spot termination monitor ──────────────────────────────────────────────────
+# On-demand instances don't receive spot interruption notices so the monitor
+# is not installed. The script is kept in scripts/ for reference if spot is
+# ever re-enabled (set use_spot = true in terraform.tfvars).
+
 echo "========================================================"
 echo "Lab setup complete: $(date)"
-echo ""
-echo "Storage:"
-df -h / "$${DATA_MOUNT}"
 echo ""
 echo "Services running:"
 docker compose -f "$${REPO_DIR}/docker/docker-compose.yml" ps

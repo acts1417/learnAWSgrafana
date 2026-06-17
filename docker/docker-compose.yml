@@ -110,29 +110,6 @@ services:
     networks:
       - lab
 
-  # ── GPU Process Exporter ──────────────────────────────────────────────────────
-  # Custom exporter: per-process GPU compute/memory via nvidia-smi pmon, so BOINC
-  # and Ollama usage can be told apart in Grafana. Exposes nvidia_process_* metrics.
-  # Built locally from docker/gpu-process-exporter/Dockerfile (context = repo root).
-  gpu-process-exporter:
-    build:
-      context: ..
-      dockerfile: docker/gpu-process-exporter/Dockerfile
-    image: lab-gpu-process-exporter
-    container_name: gpu-process-exporter
-    restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu, compute, utility]
-    networks:
-      - lab
-    ports:
-      - "127.0.0.1:9401:9401" # localhost only
-
   # ── Prometheus ───────────────────────────────────────────────────────────────
   # Scrapes metrics from node-exporter, nvidia-gpu-exporter (and boinc_exporter later).
   # UI: http://localhost:9090 (SSH tunnel required)

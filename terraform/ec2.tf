@@ -118,7 +118,7 @@ resource "aws_instance" "lab" {
 #   4. terraform apply   (volume restored from snapshot, models intact)
 resource "aws_ebs_volume" "data" {
   availability_zone = aws_subnet.public.availability_zone
-  size              = var.data_volume_size
+  size              = var.data_volume_size_gb
   type              = "gp3"
   encrypted         = true
   kms_key_id        = aws_kms_key.ebs.arn # CMK — FedRAMP SC-28
@@ -134,7 +134,8 @@ resource "aws_ebs_volume" "data" {
 }
 
 resource "aws_volume_attachment" "data" {
-  device_name = "/dev/sdf" # Presents inside the instance as a /dev/nvme*n1 device
-  volume_id   = aws_ebs_volume.data.id
-  instance_id = aws_instance.lab.id
+  device_name  = "/dev/xvdf"
+  volume_id    = aws_ebs_volume.data.id
+  instance_id  = aws_instance.lab.id
+  force_detach = false
 }
