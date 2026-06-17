@@ -53,6 +53,12 @@ variable "use_spot" {
   default     = false
 }
 
+variable "data_volume_size_gb" {
+  description = "Size of the persistent data EBS volume (GiB). Stores Docker data-root: container images, Ollama LLM models (5–40 GB each), Grafana, BOINC. 300 GB fits several large models comfortably."
+  type        = number
+  default     = 300
+}
+
 variable "repo_url" {
   description = "Git URL of this repo — cloned to the instance at first boot."
   type        = string

@@ -97,3 +97,23 @@ resource "aws_instance" "lab" {
     ignore_changes = [user_data, ami] # Prevent replacement on userdata or new DLAMI publish
   }
 }
+
+# ── Data EBS volume ───────────────────────────────────────────────────────────
+# Stores Docker data-root: container images + named volumes (Ollama LLM models,
+# Grafana dashboards, BOINC state). Separate from root so models survive
+# instance replacement and the volume can be resized independently.
+resource "aws_ebs_volume" "data" {
+  availability_zone = "${var.aws_region}a"
+  size              = var.data_volume_size_gb
+  type              = "gp3"
+  encrypted         = true
+  kms_key_id        = aws_kms_key.ebs.arn
+  tags              = { Name = "lab-data" }
+}
+
+resource "aws_volume_attachment" "data" {
+  device_name  = "/dev/xvdf"
+  volume_id    = aws_ebs_volume.data.id
+  instance_id  = aws_instance.lab.id
+  force_detach = false
+}
