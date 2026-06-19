@@ -150,6 +150,7 @@ BOINC_RPC_PASSWORD=${boinc_password}
 GRAFANA_ADMIN_PASSWORD=${grafana_admin_password}
 WEBUI_SECRET_KEY=$(openssl rand -hex 32)
 ENV
+chown ubuntu:ubuntu "$${REPO_DIR}/docker/.env"
 chmod 600 "$${REPO_DIR}/docker/.env"
 
 # ── Start Docker Compose stack ────────────────────────────────────────────────
