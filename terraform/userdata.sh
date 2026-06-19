@@ -143,6 +143,11 @@ else
   git clone --branch "$${BRANCH}" ${repo_url} "$${REPO_DIR}"
 fi
 
+# Cloned/pulled as root — hand the whole tree to ubuntu so a later interactive
+# `git pull` over SSH doesn't hit "dubious ownership" or permission-denied on .git/*.
+chown -R ubuntu:ubuntu "$${REPO_DIR}"
+sudo -u ubuntu git config --global --add safe.directory "$${REPO_DIR}"
+
 # ── Environment file ─────────────────────────────────────────────────────────
 # Terraform renders these values at plan time — they never hit the git repo.
 cat > "$${REPO_DIR}/docker/.env" <<ENV
