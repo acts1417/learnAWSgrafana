@@ -51,8 +51,10 @@ services:
   # ── Open WebUI ───────────────────────────────────────────────────────────────
   # Browser-based chat frontend for Ollama.
   # Access: http://<public-ip>:8080
-  # v0.9.6 released 2026-06-02 — routine update, no CVEs fixed (v0.9.5 patched the
-  # Critical LDAP auth bypass GHSA-2r4p-jpmg-48f4 and several High XSS/access-control CVEs).
+  # v0.9.6 released 2026-06-02 — fixes several access-control bypasses, XSS/script-injection
+  # (model profile images, Mermaid diagram rendering), SSRF gating (web loader, DNS rebinding),
+  # and auth bypasses (API key path matching, system-prompt override, terminal path traversal).
+  # v0.9.5 before it patched the Critical LDAP auth bypass GHSA-2r4p-jpmg-48f4 and XSS CVEs.
   open-webui:
     image: ghcr.io/open-webui/open-webui:v0.9.6
     container_name: open-webui
