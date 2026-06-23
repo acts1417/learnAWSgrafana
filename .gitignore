@@ -5,6 +5,8 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/terraform.tfvars
 terraform/*.tfplan
+terraform/*.bin
+terraform/lambda/*.zip
 
 # Docker secrets
 docker/.env

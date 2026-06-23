@@ -1,5 +1,5 @@
 variable "aws_region" {
-  description = "AWS region. g4dn.xlarge available in us-east-1, us-west-2, eu-west-1. GovCloud: us-gov-east-1, us-gov-west-1."
+  description = "AWS region. g5.xlarge available in us-east-1, us-west-2, eu-west-1, and others. GovCloud: us-gov-east-1, us-gov-west-1."
   type        = string
   default     = "us-east-1"
 }
@@ -20,9 +20,9 @@ variable "your_ip_cidr" {
 }
 
 variable "spot_max_price" {
-  description = "Max spot bid per hour (USD). On-demand g4dn.xlarge = ~$0.526/hr. Average spot = ~$0.18/hr. Set above recent spot to stay up, below on-demand to cap cost."
+  description = "Max spot bid per hour (USD). On-demand g5.xlarge = ~$1.006/hr. Average spot = ~$0.30-0.40/hr. Set above recent spot to stay up, below on-demand to cap cost."
   type        = string
-  default     = "0.35"
+  default     = "0.45"
 }
 
 variable "boinc_rpc_password" {
@@ -48,7 +48,7 @@ variable "grafana_admin_password" {
 }
 
 variable "use_spot" {
-  description = "true = spot instance (~$0.18/hr), false = on-demand (~$0.53/hr). Spot was abandoned due to org weekend shutdown policy causing IncorrectSpotRequestState. Default is on-demand."
+  description = "true = spot instance (~$0.30-0.40/hr), false = on-demand (~$1.006/hr for g5.xlarge). Spot was abandoned due to org weekend shutdown policy causing IncorrectSpotRequestState. Default is on-demand."
   type        = bool
   default     = false
 }

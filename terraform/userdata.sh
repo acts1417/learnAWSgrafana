@@ -190,6 +190,31 @@ UNIT
 systemctl daemon-reload
 systemctl enable lab-stack
 
+# ── Idle shutdown monitor ─────────────────────────────────────────────────────
+# Stops the instance once Open WebUI has been idle for 30 minutes, so the
+# pricier g5.xlarge isn't billed outside the ~2hrs/day of actual use.
+# Stopping the instance also pauses BOINC until the next manual/scheduled start.
+chmod +x "$${REPO_DIR}/scripts/idle-shutdown.sh"
+cat > /etc/systemd/system/idle-shutdown.service <<UNIT
+[Unit]
+Description=Stop instance after Open WebUI is idle
+After=network-online.target docker.service lab-stack.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash $${REPO_DIR}/scripts/idle-shutdown.sh
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable idle-shutdown
+systemctl start idle-shutdown
+
 # ── Spot termination monitor ──────────────────────────────────────────────────
 # On-demand instances don't receive spot interruption notices so the monitor
 # is not installed. The script is kept in scripts/ for reference if spot is

@@ -48,7 +48,10 @@ resource "aws_security_group" "lab" {
 
 resource "aws_instance" "lab" {
   ami                    = data.aws_ami.dlami.id
-  instance_type          = "g4dn.xlarge"
+  # g5.xlarge (NVIDIA A10G, 600 GB/s memory bandwidth) over g4dn.xlarge (T4, 320 GB/s):
+  # single-stream LLM decode is bandwidth-bound, so A10G roughly halves per-token latency.
+  # ~2hrs/day usage keeps this well under budget — see variables.tf use_spot for cost notes.
+  instance_type          = "g5.xlarge"
   key_name               = var.key_pair_name
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.lab.id]
