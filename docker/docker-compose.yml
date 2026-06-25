@@ -62,8 +62,16 @@ services:
   # (model profile images, Mermaid diagram rendering), SSRF gating (web loader, DNS rebinding),
   # and auth bypasses (API key path matching, system-prompt override, terminal path traversal).
   # v0.9.5 before it patched the Critical LDAP auth bypass GHSA-2r4p-jpmg-48f4 and XSS CVEs.
+  # Built locally from docker/open-webui/Dockerfile (context = repo root) to cherry-pick a fix
+  # for a v0.9.6 regression: get_sources_from_items() never matches type == 'web_search', so
+  # search-result collections get silently dropped instead of queried (no sources, ever).
+  # Upstream fix unmerged: github.com/open-webui/open-webui/pull/25600. Drop this custom build
+  # and go back to `image: ghcr.io/open-webui/open-webui:<tag>` once a release includes it.
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.9.6
+    build:
+      context: ..
+      dockerfile: docker/open-webui/Dockerfile
+    image: lab-open-webui
     container_name: open-webui
     restart: unless-stopped
     environment:
