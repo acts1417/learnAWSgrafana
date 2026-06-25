@@ -34,6 +34,13 @@ services:
     image: ollama/ollama:0.23.2
     container_name: ollama
     restart: unless-stopped
+    environment:
+      # Default 5m keep_alive unloads models between normal pauses in testing/
+      # discussion, forcing a multi-GB cold reload (8-9GB per 12-14B model) on
+      # the next message. 30m matches the idle-shutdown window so models stay
+      # warm for as long as the instance does, with no leftover VRAM held once
+      # it's about to stop anyway.
+      - OLLAMA_KEEP_ALIVE=30m
     volumes:
       - ollama_data:/root/.ollama
     deploy:
