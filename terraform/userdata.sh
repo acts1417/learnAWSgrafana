@@ -216,20 +216,22 @@ systemctl enable idle-shutdown
 systemctl start idle-shutdown
 
 # ── Idle-shutdown countdown page ──────────────────────────────────────────────
-# Static page + status.json written by idle-shutdown.sh, served so the
-# countdown to the next idle shutdown can be glanced at in a browser tab.
+# Static page + status.json written by idle-shutdown.sh, plus a tiny
+# control server (shutdown-now / reset-timer buttons) so the countdown
+# and instance control don't require going through Open WebUI.
 mkdir -p /opt/lab/idle-status
 cp "$${REPO_DIR}/scripts/idle-status/index.html" /opt/lab/idle-status/index.html
+cp "$${REPO_DIR}/scripts/idle-status/server.py" /opt/lab/idle-status/server.py
 cat > /etc/systemd/system/idle-status-server.service <<UNIT
 [Unit]
-Description=Serve the idle-shutdown countdown page
+Description=Serve the idle-shutdown countdown page and its control endpoints
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 WorkingDirectory=/opt/lab/idle-status
-ExecStart=/usr/bin/python3 -m http.server 8081 --bind 0.0.0.0
+ExecStart=/usr/bin/python3 /opt/lab/idle-status/server.py
 Restart=on-failure
 RestartSec=10
 

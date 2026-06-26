@@ -27,14 +27,43 @@
   }
   .warn { color: #e0a030; }
   .danger { color: #e04030; }
+  #buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+  }
+  button {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+  }
+  button:hover { background: #333; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #shutdownBtn:hover { background: #4a1f1f; border-color: #e04030; }
+  #actionMsg {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 0.75rem;
+    min-height: 1.2em;
+  }
 </style>
 </head>
 <body>
   <div id="timer">--:--</div>
   <div id="label">loading...</div>
+  <div id="buttons">
+    <button id="resetBtn">Reset timer (+30m)</button>
+    <button id="shutdownBtn">Shut down now</button>
+  </div>
+  <div id="actionMsg"></div>
 
 <script>
 let shutdownAtEpoch = null;
+let idleMinutes = 30;
 let state = "active";
 let lastFaviconColor = null;
 
@@ -61,11 +90,54 @@ async function refreshStatus() {
     const res = await fetch("status.json", { cache: "no-store" });
     const data = await res.json();
     shutdownAtEpoch = data.shutdown_at_epoch;
+    idleMinutes = data.idle_minutes;
     state = data.state;
   } catch (e) {
     document.getElementById("label").textContent = "status unavailable";
   }
 }
+
+function showActionMsg(text) {
+  const el = document.getElementById("actionMsg");
+  el.textContent = text;
+  setTimeout(() => { if (el.textContent === text) el.textContent = ""; }, 5000);
+}
+
+async function resetTimer() {
+  const btn = document.getElementById("resetBtn");
+  btn.disabled = true;
+  try {
+    const res = await fetch("/api/reset", { method: "POST" });
+    if (!res.ok) throw new Error("request failed");
+    // Optimistic update — idle-shutdown.sh picks up the marker file and
+    // rewrites status.json on its next check, this just avoids the wait.
+    shutdownAtEpoch = Math.floor(Date.now() / 1000) + idleMinutes * 60;
+    state = "active";
+    render();
+    showActionMsg("Timer reset to " + idleMinutes + "m");
+  } catch (e) {
+    showActionMsg("Reset failed");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function shutdownNow() {
+  if (!confirm("Shut down the EC2 instance now?")) return;
+  const btn = document.getElementById("shutdownBtn");
+  btn.disabled = true;
+  try {
+    const res = await fetch("/api/shutdown", { method: "POST" });
+    if (!res.ok) throw new Error("request failed");
+    showActionMsg("Shutting down...");
+  } catch (e) {
+    showActionMsg("Shutdown request failed");
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("resetBtn").addEventListener("click", resetTimer);
+document.getElementById("shutdownBtn").addEventListener("click", shutdownNow);
 
 function render() {
   if (shutdownAtEpoch === null) return;

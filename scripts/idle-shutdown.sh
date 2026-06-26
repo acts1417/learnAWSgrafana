@@ -17,6 +17,7 @@ IDLE_MINUTES=30
 CHECK_INTERVAL=300 # 5 minutes
 LOG_TAG="idle-shutdown"
 STATUS_FILE="/opt/lab/idle-status/status.json"
+RESET_FILE="/opt/lab/idle-status/manual_reset_epoch"
 
 log() {
   logger -t "$LOG_TAG" "$1"
@@ -51,6 +52,17 @@ while true; do
     LAST_ACTIVITY_EPOCH=$(date -d "$(echo "$LAST_LINE" | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}')" +%s)
   else
     LAST_ACTIVITY_EPOCH=$STARTED_AT_EPOCH
+  fi
+
+  # The countdown page's "reset timer" button writes its click time here
+  # (see scripts/idle-status/server.py) — honor it if it's newer than
+  # anything found in the logs, so a manual reset extends the deadline
+  # even with no real Open WebUI traffic.
+  if [ -f "$RESET_FILE" ]; then
+    RESET_EPOCH=$(cat "$RESET_FILE" 2>/dev/null || echo 0)
+    if [ "$RESET_EPOCH" -gt "$LAST_ACTIVITY_EPOCH" ] 2>/dev/null; then
+      LAST_ACTIVITY_EPOCH=$RESET_EPOCH
+    fi
   fi
 
   IDLE_SECONDS=$((NOW_EPOCH - LAST_ACTIVITY_EPOCH))
