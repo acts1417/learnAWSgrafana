@@ -33,6 +33,14 @@ resource "aws_security_group" "lab" {
     cidr_blocks = [var.your_ip_cidr]
   }
 
+  ingress {
+    description = "Idle-shutdown countdown page"
+    from_port   = 8081
+    to_port     = 8081
+    protocol    = "tcp"
+    cidr_blocks = [var.your_ip_cidr]
+  }
+
   egress {
     description = "Allow all outbound (Docker pulls, BOINC work, OS updates)"
     from_port   = 0

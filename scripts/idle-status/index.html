@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lab idle-shutdown timer</title>
+<style>
+  body {
+    background: #111;
+    color: #eee;
+    font-family: -apple-system, Segoe UI, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+  }
+  #timer {
+    font-size: 4rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  #label {
+    font-size: 1rem;
+    color: #888;
+    margin-top: 0.5rem;
+  }
+  .warn { color: #e0a030; }
+  .danger { color: #e04030; }
+</style>
+</head>
+<body>
+  <div id="timer">--:--</div>
+  <div id="label">loading...</div>
+
+<script>
+let shutdownAtEpoch = null;
+let state = "active";
+
+async function refreshStatus() {
+  try {
+    const res = await fetch("status.json", { cache: "no-store" });
+    const data = await res.json();
+    shutdownAtEpoch = data.shutdown_at_epoch;
+    state = data.state;
+  } catch (e) {
+    document.getElementById("label").textContent = "status unavailable";
+  }
+}
+
+function render() {
+  if (shutdownAtEpoch === null) return;
+  const nowEpoch = Math.floor(Date.now() / 1000);
+  const remaining = shutdownAtEpoch - nowEpoch;
+  const timerEl = document.getElementById("timer");
+  const labelEl = document.getElementById("label");
+
+  if (state === "shutting_down" || remaining <= 0) {
+    timerEl.textContent = "00:00";
+    timerEl.className = "danger";
+    labelEl.textContent = "shutting down";
+    return;
+  }
+
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  timerEl.textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  timerEl.className = remaining < 300 ? "danger" : remaining < 600 ? "warn" : "";
+  labelEl.textContent = "until idle shutdown";
+}
+
+refreshStatus();
+setInterval(refreshStatus, 15000);
+setInterval(render, 1000);
+</script>
+</body>
+</html>

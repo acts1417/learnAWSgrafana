@@ -215,6 +215,32 @@ systemctl daemon-reload
 systemctl enable idle-shutdown
 systemctl start idle-shutdown
 
+# ── Idle-shutdown countdown page ──────────────────────────────────────────────
+# Static page + status.json written by idle-shutdown.sh, served so the
+# countdown to the next idle shutdown can be glanced at in a browser tab.
+mkdir -p /opt/lab/idle-status
+cp "$${REPO_DIR}/scripts/idle-status/index.html" /opt/lab/idle-status/index.html
+cat > /etc/systemd/system/idle-status-server.service <<UNIT
+[Unit]
+Description=Serve the idle-shutdown countdown page
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/lab/idle-status
+ExecStart=/usr/bin/python3 -m http.server 8081 --bind 0.0.0.0
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+systemctl daemon-reload
+systemctl enable idle-status-server
+systemctl start idle-status-server
+
 # ── Spot termination monitor ──────────────────────────────────────────────────
 # On-demand instances don't receive spot interruption notices so the monitor
 # is not installed. The script is kept in scripts/ for reference if spot is
