@@ -36,6 +36,25 @@
 <script>
 let shutdownAtEpoch = null;
 let state = "active";
+let lastFaviconColor = null;
+
+const faviconLink = document.createElement("link");
+faviconLink.rel = "icon";
+document.head.appendChild(faviconLink);
+
+function setFavicon(color) {
+  if (color === lastFaviconColor) return;
+  lastFaviconColor = color;
+  const canvas = document.createElement("canvas");
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext("2d");
+  ctx.beginPath();
+  ctx.arc(16, 16, 14, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
+  ctx.fill();
+  faviconLink.href = canvas.toDataURL("image/png");
+}
 
 async function refreshStatus() {
   try {
@@ -59,14 +78,19 @@ function render() {
     timerEl.textContent = "00:00";
     timerEl.className = "danger";
     labelEl.textContent = "shutting down";
+    document.title = "⏹ shutting down";
+    setFavicon("#e04030");
     return;
   }
 
   const m = Math.floor(remaining / 60);
   const s = remaining % 60;
-  timerEl.textContent = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  const clock = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  timerEl.textContent = clock;
   timerEl.className = remaining < 300 ? "danger" : remaining < 600 ? "warn" : "";
   labelEl.textContent = "until idle shutdown";
+  document.title = clock + " idle timer";
+  setFavicon(remaining < 300 ? "#e04030" : remaining < 600 ? "#e0a030" : "#30a040");
 }
 
 refreshStatus();
